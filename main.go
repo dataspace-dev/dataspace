@@ -2,18 +2,16 @@ package main
 
 import (
 	"dataspace/api"
-	"fmt"
 	"sync"
 )
 
 func main() {
-	fmt.Println("Hello, World!")
-
-	// Create a wait group
 	var wg sync.WaitGroup
 
 	wg.Add(1)
 
+	// This starts the API REST where the routes are defined and the server is run
+	// The frontend will call the routes in it
 	go api.Start()
 
 	wg.Wait()
