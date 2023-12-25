@@ -55,10 +55,10 @@ func createUser(req signupRequest) (conflict bool, err error) {
 		Password: req.Password,
 	}
 
-	exists := cnx.Where("username = ?", user.Username).Or("email = ?", user.Email).First(&user).Error == nil
-	if exists {
+	existingUser := cnx.Find(&user, "username = ? OR email = ?", req.Username, req.Email)
+	if existingUser.RowsAffected > 0 {
 		return true, nil
-	}
+	}	
 
 	err = cnx.Create(&user).Error
 	if err != nil {
