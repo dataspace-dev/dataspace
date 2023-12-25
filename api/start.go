@@ -17,10 +17,9 @@ func Start() {
 	// Create the Gin engine.
 	r := gin.Default()
 
-
 	r.Use(cors.Default())
 
 	general.SetupRoutes(r)
 
-	r.Run(":8080") 
+	r.Run(":8080")
 }
