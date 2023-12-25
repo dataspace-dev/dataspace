@@ -5,6 +5,7 @@ import (
 	"dataspace/db/models"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type signupRequest struct {
@@ -15,7 +16,7 @@ type signupRequest struct {
 }
 
 func signupHandler(c *gin.Context) {
-
+	// Validate the request
 	var req signupRequest
 	if err := c.ShouldBindJSON(&req); err != nil || req.Name == "" || req.Username == "" || req.Email == "" || req.Password == "" {
 		c.JSON(400, gin.H{
@@ -24,7 +25,9 @@ func signupHandler(c *gin.Context) {
 		return
 	}
 
-	conflict, err := createUser(req)
+	encryptPassword(&req.Password) // Encrypt the password
+
+	conflict, err := createUser(req) // Create the user
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": "Internal server error",
@@ -42,9 +45,20 @@ func signupHandler(c *gin.Context) {
 		})
 		return
 	}
-
 }
 
+// encryptPassword encrypts the password using bcrypt
+// It modifies the password string in place
+func encryptPassword(password *string) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(*password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	*password = string(hashed)
+}
+
+// createUser creates a new user in the database
+// It returns a boolean indicating whether there was a conflict and an error
 func createUser(req signupRequest) (conflict bool, err error) {
 	cnx := db.GetConnection()
 
