@@ -1,18 +1,18 @@
 package main
 
 import (
-	"dataspace/api"
+	"dataspace/bootstrap"
 	"sync"
 )
 
 func main() {
+
+	bootstrap.LoadEnv() // Load the .env file
+	bootstrap.SetGitMode() // Set the Gin mode (release or debug)
+
+	// Load the subprocesses (api, socket manager, etc.)
 	var wg sync.WaitGroup
-
-	wg.Add(1)
-
-	// This starts the API REST where the routes are defined and the server is run
-	// The frontend will call the routes in it
-	go api.Start()
-
+	bootstrap.LoadSubprocesses(&wg) 
 	wg.Wait()
 }
+
