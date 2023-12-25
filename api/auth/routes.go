@@ -6,5 +6,6 @@ func SetupRoutes(router *gin.Engine) {
 	authGroup := router.Group("/auth")
 	{
 		authGroup.POST("/signup", signupHandler)
+		authGroup.POST("/login", loginHandler)
 	}
 }
