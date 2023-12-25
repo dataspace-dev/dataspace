@@ -1,6 +1,7 @@
 package api
 
 import (
+	"dataspace/api/auth"
 	"dataspace/api/general"
 	"os"
 
@@ -20,6 +21,7 @@ func Start() {
 	r.Use(cors.Default())
 
 	general.SetupRoutes(r)
+	auth.SetupRoutes(r)
 
 	r.Run(":8080")
 }
