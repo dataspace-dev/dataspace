@@ -3,7 +3,11 @@ package connections
 import "database/sql"
 
 type connection struct {
+	// The raw connection to the database
 	cnx *sql.DB
+
+	// We store the DSN in the connection struct so that we can use it to reconnect
+	dsn string
 }
 
 // Ping sends a ping request to the database server to check the connection status.
@@ -17,6 +21,9 @@ func (p *connection) Connect(dsn string) error {
 	if err != nil {
 		return err
 	}
-	p.cnx = cnx
+	p = &connection{
+		cnx: cnx,
+		dsn: dsn,
+	}
 	return nil
 }

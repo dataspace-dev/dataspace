@@ -8,4 +8,5 @@ import (
 func RunMigrations() {
 	db := db.GetConnection()
 	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Conection{})
 }

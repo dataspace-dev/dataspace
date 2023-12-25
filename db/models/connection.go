@@ -10,4 +10,5 @@ type Conection struct {
 	User    string
 	Pass    string
 	SSLMode string
+	UserID  uint
 }
