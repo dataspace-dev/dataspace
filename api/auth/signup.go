@@ -3,6 +3,7 @@ package auth
 import (
 	"dataspace/db"
 	"dataspace/db/models"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -19,7 +20,7 @@ func signupHandler(c *gin.Context) {
 	// Validate the request
 	var req signupRequest
 	if err := c.ShouldBindJSON(&req); err != nil || req.Name == "" || req.Username == "" || req.Email == "" || req.Password == "" {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid request",
 		})
 		return
@@ -29,18 +30,18 @@ func signupHandler(c *gin.Context) {
 
 	conflict, err := createUser(req) // Create the user
 	if err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal server error",
 			"error":   err.Error(),
 		})
 		return
 	} else if conflict {
-		c.JSON(409, gin.H{
+		c.JSON(http.StatusConflict, gin.H{
 			"message": "Username or email already exists",
 		})
 		return
 	} else {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message": "User created",
 		})
 		return

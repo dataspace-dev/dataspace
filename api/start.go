@@ -3,6 +3,7 @@ package api
 import (
 	"dataspace/api/auth"
 	"dataspace/api/general"
+	"dataspace/api/connections"
 	"os"
 
 	"github.com/gin-contrib/cors"
@@ -22,6 +23,7 @@ func Start() {
 
 	general.SetupRoutes(r)
 	auth.SetupRoutes(r)
+	connections.SetupRoutes(r)
 
 	r.Run(":8080")
 }

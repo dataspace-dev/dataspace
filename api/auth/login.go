@@ -4,6 +4,7 @@ import (
 	"dataspace/db"
 	"dataspace/db/models"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -21,7 +22,7 @@ func loginHandler(c *gin.Context) {
 	// Validate the request
 	var req loginRequest
 	if err := c.ShouldBindJSON(&req); err != nil || req.Username == "" || req.Password == "" {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid request",
 		})
 		return
@@ -29,23 +30,23 @@ func loginHandler(c *gin.Context) {
 
 	user, err := getUser(req.Username) // Get the user
 	if err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Internal server error",
 			"error":   err.Error(),
 		})
 		return
 	} else if user == nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"message": "User not found",
 		})
 		return
 	} else if !checkPassword(req.Password, user.Password) {
-		c.JSON(401, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Incorrect password",
 		})
 		return
 	} else {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message": "Login successful",
 			"bearer token": generateToken(user),
 		})
