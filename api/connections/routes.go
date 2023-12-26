@@ -11,5 +11,6 @@ func SetupRoutes(router *gin.Engine) {
 	{
 		connectionsGroup.POST("/connections", middlewares.AuthMiddleware(), handleCreate)
 		connectionsGroup.GET("/connections", middlewares.AuthMiddleware(), handleList)
+		connectionsGroup.GET("/schema", middlewares.AuthMiddleware(), handleSchema)
 	}
 }

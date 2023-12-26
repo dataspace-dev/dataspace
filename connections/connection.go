@@ -8,9 +8,10 @@ import (
 type connection struct {
 	// The raw connection to the database
 	cnx *sql.DB
-
 	// We store the DSN in the connection struct so that we can use it to reconnect
 	dsn string
+	// Userid owner of the connection
+	owner uint
 }
 
 // Ping sends a ping request to the database server to check the connection status.
@@ -35,4 +36,32 @@ func (p *connection) Connect(dsn string) error {
 	p.cnx = cnx // Update the cnx field of the receiver
 	p.dsn = dsn // Update the dsn field of the receiver
 	return nil
+}
+
+// GetCopyConnection returns a copy of the connection for long running operations.
+// It returns an error if the connection is nil.
+func (p *connection) GetCopyConnection() (connection, error) {
+	if p.cnx == nil {
+		return connection{}, sql.ErrConnDone
+	}
+	var newCnx connection
+	err := newCnx.Connect(p.dsn)
+	if err != nil {
+		return connection{}, err
+	}
+	return newCnx, nil
+}
+
+// SetOwner sets the owner of the connection.
+func (p *connection) SetOwner(owner uint) {
+	p.owner = owner
+}
+
+// GetSchema returns the schema of the database.
+func (p *connection) GetSchema() (map[string]interface{}, error) {
+	q, err := p.GetCopyConnection()
+	if err != nil {
+		return nil, err
+	}
+	return q.getFullDbSchema()
 }

@@ -1,6 +1,7 @@
 package connections
 
 import (
+	"dataspace/db"
 	"dataspace/db/types"
 	"fmt"
 	"strings"
@@ -20,6 +21,19 @@ type manager struct {
 // GetConnection retrieves a connection from the connection pool based on the given ID.
 // It returns the connection if found, otherwise it returns nil.
 func (m *manager) GetConnection(id int) *connection {
+	if _, ok := m.pool[id]; !ok { // Check if the connection does not exist in the pool
+		cnx := db.GetConnection()
+		var dbData types.Connection
+		if err := cnx.Find(&dbData, "id = ?", id).Error; err != nil { // Get the connection data from the database
+			return nil
+		}
+		fmt.Printf("Pool size: %d\n", len(m.pool))
+		if err := m.AddConnection(id, &dbData); err != nil { // Add the connection to the connection pool
+			return nil
+		}
+		fmt.Printf("Added connection to the pool (id: %d)\n", id)
+		fmt.Printf("Pool size: %d\n", len(m.pool))
+	}
 	return m.pool[id]
 }
 
@@ -31,6 +45,7 @@ func (m *manager) AddConnection(id int, dbData *types.Connection) error {
 	if err != nil {
 		return fmt.Errorf("there was an error connecting to the database (id: %d): %w", id, err)
 	}
+	cnx.SetOwner(dbData.UserID)
 	m.pool[id] = &cnx
 	return nil
 }
