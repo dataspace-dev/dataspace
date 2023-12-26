@@ -2,7 +2,7 @@ package auth
 
 import (
 	"dataspace/db"
-	"dataspace/db/models"
+	db1 "dataspace/db/db"
 	"fmt"
 	"net/http"
 	"os"
@@ -47,7 +47,7 @@ func loginHandler(c *gin.Context) {
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Login successful",
+			"message":      "Login successful",
 			"bearer token": generateToken(user),
 		})
 	}
@@ -62,8 +62,8 @@ func checkPassword(password string, hash string) bool {
 
 // getUser gets a user from the database
 // Returns nil if the user is not found
-func getUser(username string) (*models.User, error) {
-	var user models.User
+func getUser(username string) (*db1.User, error) {
+	var user db1.User
 	result := db.GetConnection().Where("username = ?", username).Find(&user)
 	if result.Error != nil {
 		fmt.Println("Error getting user:", result.Error)
@@ -76,10 +76,10 @@ func getUser(username string) (*models.User, error) {
 }
 
 // generateToken generates a JWT token for the user
-func generateToken(user *models.User) (string) {
+func generateToken(user *db1.User) string {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		fmt.Println("JWT_SECRET environment variable not set")	
+		fmt.Println("JWT_SECRET environment variable not set")
 		os.Exit(1)
 	}
 

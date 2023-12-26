@@ -1,7 +1,8 @@
 package connections
 
-import "dataspace/db/models"
+import "dataspace/db/db"
 
+// This is the connection pool, it stores all the connections that are created.
 type connectionPool struct {
 	pool map[int]*connection
 }
@@ -13,7 +14,7 @@ func (p *connectionPool) GetConnection(id int) *connection {
 }
 
 // AddConnection adds a connection to the connection pool.
-func (p *connectionPool) AddConnection(id int, dbData *models.Conection) error {
+func (p *connectionPool) AddConnection(id int, dbData *db.Conection) error {
 	dsn := "host=" + dbData.Host + " port=" + dbData.Port + " dbname=" + dbData.Dbname + " user=" + dbData.User + " password=" + dbData.Pass + " sslmode=" + dbData.SSLMode
 	var cnx connection
 	err := cnx.Connect(dsn)

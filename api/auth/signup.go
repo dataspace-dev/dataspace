@@ -2,7 +2,7 @@ package auth
 
 import (
 	"dataspace/db"
-	"dataspace/db/models"
+	db1 "dataspace/db/db"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -63,7 +63,7 @@ func encryptPassword(password *string) {
 func createUser(req signupRequest) (conflict bool, err error) {
 	cnx := db.GetConnection()
 
-	var user models.User = models.User{
+	var user db1.User = db1.User{
 		Name:     req.Name,
 		Username: req.Username,
 		Email:    req.Email,
@@ -73,7 +73,7 @@ func createUser(req signupRequest) (conflict bool, err error) {
 	existingUser := cnx.Find(&user, "username = ? OR email = ?", req.Username, req.Email)
 	if existingUser.RowsAffected > 0 {
 		return true, nil
-	}	
+	}
 
 	err = cnx.Create(&user).Error
 	if err != nil {

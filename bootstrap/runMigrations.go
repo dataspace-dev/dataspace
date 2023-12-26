@@ -2,11 +2,11 @@ package bootstrap
 
 import (
 	"dataspace/db"
-	"dataspace/db/models"
+	db1 "dataspace/db/db"
 )
 
 func RunMigrations() {
 	db := db.GetConnection()
-	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Conection{})
+	db.AutoMigrate(&db1.User{})
+	db.AutoMigrate(&db1.Conection{})
 }

@@ -14,13 +14,15 @@ var (
 	instance *gorm.DB
 )
 
+// GetConnection returns a gorm.DB instance
 func GetConnection() *gorm.DB {
-	once.Do(func() {
+	once.Do(func() { // Singleton, only one instance of the database connection will be created
 		instance = connect()
 	})
 	return instance
 }
 
+// connects to the internal app database and returns a gorm.DB instance
 func connect() *gorm.DB {
 	dsn := os.Getenv("INTERNAL_DB_DSN")
 	if dsn == "" {
