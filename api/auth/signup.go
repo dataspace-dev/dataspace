@@ -2,7 +2,7 @@ package auth
 
 import (
 	"dataspace/db"
-	db1 "dataspace/db/db"
+	"dataspace/db/types"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -63,7 +63,7 @@ func encryptPassword(password *string) {
 func createUser(req signupRequest) (conflict bool, err error) {
 	cnx := db.GetConnection()
 
-	var user db1.User = db1.User{
+	var user types.User = types.User{
 		Name:     req.Name,
 		Username: req.Username,
 		Email:    req.Email,

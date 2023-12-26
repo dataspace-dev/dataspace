@@ -1,26 +1,60 @@
 package connections
 
-import "dataspace/db/db"
+import (
+	"dataspace/db/types"
+	"fmt"
+	"strings"
+)
 
-// This is the connection pool, it stores all the connections that are created.
-type connectionPool struct {
+// The global connection manager
+var ConnectionsManager = manager{
+	pool: make(map[int]*connection),
+}
+
+// This is the type of the connection manager
+type manager struct {
+	// pool is a map that stores the connections
 	pool map[int]*connection
 }
 
 // GetConnection retrieves a connection from the connection pool based on the given ID.
 // It returns the connection if found, otherwise it returns nil.
-func (p *connectionPool) GetConnection(id int) *connection {
-	return p.pool[id]
+func (m *manager) GetConnection(id int) *connection {
+	return m.pool[id]
 }
 
 // AddConnection adds a connection to the connection pool.
-func (p *connectionPool) AddConnection(id int, dbData *db.Conection) error {
-	dsn := "host=" + dbData.Host + " port=" + dbData.Port + " dbname=" + dbData.Dbname + " user=" + dbData.User + " password=" + dbData.Pass + " sslmode=" + dbData.SSLMode
+func (m *manager) AddConnection(id int, dbData *types.Connection) error {
+	dsn := BuildDsn(dbData)
 	var cnx connection
 	err := cnx.Connect(dsn)
 	if err != nil {
-		return err
+		return fmt.Errorf("there was an error connecting to the database (id: %d): %w", id, err)
 	}
-	p.pool[id] = &cnx
+	m.pool[id] = &cnx
+	return nil
+}
+
+// TestConnectionTemporarily tests a connection to the database given de connection data without adding it to the connection pool.
+// It returns an error if the connection fails.
+func (m *manager) TestConnectionTemporarily(dbData *types.Connection) error {
+	dsn := BuildDsn(dbData)
+	var cnx connection
+	err := cnx.Connect(dsn)
+	if err != nil {
+		if strings.Contains(err.Error(), "connection refused") {
+			return fmt.Errorf("the connection was refused, please check the connection data")
+		} else if strings.Contains(err.Error(), "no pg_hba.conf entry for host") {
+			return fmt.Errorf("the host is not allowed to connect to the database, please check the connection data")
+		} else if strings.Contains(err.Error(), "password authentication failed") {
+			return fmt.Errorf("the password is incorrect, please check the connection data")
+		} else {
+			return fmt.Errorf("there was an error connecting to the database: %w", err)
+		}
+	}
+	err = cnx.Ping()
+	if err != nil {
+		return fmt.Errorf("there was an error pinging the database: %w", err)
+	}
 	return nil
 }

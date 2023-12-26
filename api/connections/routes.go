@@ -1,10 +1,14 @@
 package connections
 
-import "github.com/gin-gonic/gin"
+import (
+	"dataspace/api/middlewares"
+
+	"github.com/gin-gonic/gin"
+)
 
 func SetupRoutes(router *gin.Engine) {
 	connectionsGroup := router.Group("/")
 	{
-		connectionsGroup.POST("/connections", handleCreate)
+		connectionsGroup.POST("/connections", middlewares.AuthMiddleware(), handleCreate)
 	}
 }

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"dataspace/db"
-	db1 "dataspace/db/db"
+	"dataspace/db/types"
 	"fmt"
 	"net/http"
 	"os"
@@ -62,8 +62,8 @@ func checkPassword(password string, hash string) bool {
 
 // getUser gets a user from the database
 // Returns nil if the user is not found
-func getUser(username string) (*db1.User, error) {
-	var user db1.User
+func getUser(username string) (*types.User, error) {
+	var user types.User
 	result := db.GetConnection().Where("username = ?", username).Find(&user)
 	if result.Error != nil {
 		fmt.Println("Error getting user:", result.Error)
@@ -76,7 +76,7 @@ func getUser(username string) (*db1.User, error) {
 }
 
 // generateToken generates a JWT token for the user
-func generateToken(user *db1.User) string {
+func generateToken(user *types.User) string {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		fmt.Println("JWT_SECRET environment variable not set")

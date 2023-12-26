@@ -1,4 +1,4 @@
-package db
+package types
 
 import "gorm.io/gorm"
 
@@ -9,5 +9,5 @@ type User struct {
 	Username    string
 	Email       string
 	Password    string
-	Connections []Conection `gorm:"foreignKey:UserID"`
+	Connections []Connection `gorm:"foreignKey:UserID"`
 }
