@@ -27,12 +27,9 @@ func (m *manager) GetConnection(id int) *connection {
 		if err := cnx.Find(&dbData, "id = ?", id).Error; err != nil { // Get the connection data from the database
 			return nil
 		}
-		fmt.Printf("Pool size: %d\n", len(m.pool))
 		if err := m.AddConnection(id, &dbData); err != nil { // Add the connection to the connection pool
 			return nil
 		}
-		fmt.Printf("Added connection to the pool (id: %d)\n", id)
-		fmt.Printf("Pool size: %d\n", len(m.pool))
 	}
 	return m.pool[id]
 }

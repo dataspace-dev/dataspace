@@ -2,7 +2,6 @@ package connections
 
 import (
 	"dataspace/connections"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,7 +40,6 @@ func handleSchema(c *gin.Context) {
 // getSchema returns the schema of the database
 func getSchema(id int) (map[string]interface{}, error) {
 	cnx := connections.ConnectionsManager.GetConnection(id) // Get the connection from the connection pool
-	fmt.Printf("Connection: %v\n", cnx)
 	if cnx == nil {
 		return nil, nil
 	}
